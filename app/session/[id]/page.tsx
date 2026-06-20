@@ -6,6 +6,7 @@ import { nextQuestionType } from '@/lib/jury-strategy'
 import JuryQuestion from '@/components/JuryQuestion'
 import StudentResponse from '@/components/StudentResponse'
 import SessionTimer from '@/components/SessionTimer'
+import TeacherPanel from '@/components/TeacherPanel'
 import type { JurySession, JuryQuestion as JuryQuestionRow, Exchange, QuestionType } from '@/lib/supabase/types'
 
 export default function SessionPage() {
@@ -21,6 +22,7 @@ export default function SessionPage() {
   const [waitingForQuestion, setWaitingForQuestion] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [startedAt] = useState(() => new Date())
+  const [pendingAnnotation, setPendingAnnotation] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadSession() {
@@ -103,8 +105,10 @@ export default function SessionPage() {
       question_type: currentQuestion.type,
       reponse,
       hesitation_sec: hesitationSec,
+      annotation: pendingAnnotation ?? undefined,
       timestamp: new Date().toISOString(),
     }
+    setPendingAnnotation(null)
     const newHistory = [...history, exchange]
     setHistory(newHistory)
     setCurrentQuestion(null)
@@ -190,6 +194,16 @@ export default function SessionPage() {
         onSend={handleResponse}
         disabled={waitingForQuestion || !currentQuestion}
       />
+
+      {/* Teacher panel for mode B */}
+      {session.mode === 'B' && currentQuestion && (
+        <TeacherPanel
+          nextType={currentQuestion.type}
+          onInject={q => setCurrentQuestion({ question: q, type: 'perso' })}
+          onSkip={() => { setCurrentQuestion(null); if (session) fetchNextQuestion(history, session, customQuestions) }}
+          onAnnotate={note => setPendingAnnotation(note)}
+        />
+      )}
 
       {/* End session */}
       <div className="mt-4 text-center">
