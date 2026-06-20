@@ -195,8 +195,8 @@ export default function SessionPage() {
         disabled={waitingForQuestion || !currentQuestion}
       />
 
-      {/* Teacher panel for mode B */}
-      {session.mode === 'B' && currentQuestion && (
+      {/* Teacher panel for mode B — hidden while waiting to prevent double-skip */}
+      {session.mode === 'B' && currentQuestion && !waitingForQuestion && (
         <TeacherPanel
           nextType={currentQuestion.type}
           onInject={q => setCurrentQuestion({ question: q, type: 'perso' })}
