@@ -116,7 +116,11 @@ export default function SessionPage() {
       .from('jury_sessions')
       .update({ ended_at: new Date().toISOString() })
       .eq('id', id)
-    router.push(`/session/${id}/report?history=${encodeURIComponent(JSON.stringify(history))}`)
+    // Use sessionStorage to pass history (avoids URL length limits for long sessions)
+    try {
+      sessionStorage.setItem(`jury_history_${id}`, JSON.stringify(history))
+    } catch { /* storage unavailable — report page will handle missing history */ }
+    router.push(`/session/${id}/report`)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, history])
 

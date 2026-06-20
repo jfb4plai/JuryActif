@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface Props {
   startedAt: Date
@@ -10,8 +10,9 @@ interface Props {
 export default function SessionTimer({ startedAt, dureeCibleMin, onTimeUp }: Props) {
   const [elapsed, setElapsed] = useState(0)
   const total = dureeCibleMin * 60
-
-  const handleTimeUp = useCallback(onTimeUp, [])
+  // Ref to always call the latest onTimeUp (avoids stale closure capturing empty history)
+  const onTimeUpRef = useRef(onTimeUp)
+  useEffect(() => { onTimeUpRef.current = onTimeUp }, [onTimeUp])
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -19,11 +20,11 @@ export default function SessionTimer({ startedAt, dureeCibleMin, onTimeUp }: Pro
       setElapsed(secs)
       if (secs >= total) {
         clearInterval(id)
-        handleTimeUp()
+        onTimeUpRef.current()
       }
     }, 1000)
     return () => clearInterval(id)
-  }, [startedAt, total, handleTimeUp])
+  }, [startedAt, total])
 
   const pct = Math.min(100, (elapsed / total) * 100)
   const remaining = Math.max(0, total - elapsed)
