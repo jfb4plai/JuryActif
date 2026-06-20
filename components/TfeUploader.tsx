@@ -3,7 +3,7 @@ import { useState, useRef } from 'react'
 import { extractTextFromPdf } from '@/lib/pdf-extractor'
 
 interface Props {
-  onExtracted: (text: string, filename: string) => void
+  onExtracted: (text: string, filename: string, truncated: boolean) => void
 }
 
 export default function TfeUploader({ onExtracted }: Props) {
@@ -17,8 +17,8 @@ export default function TfeUploader({ onExtracted }: Props) {
     setLoading(true)
     setError(null)
     try {
-      const text = await extractTextFromPdf(file)
-      onExtracted(text, file.name.replace(/\.pdf$/i, ''))
+      const { text, truncated } = await extractTextFromPdf(file)
+      onExtracted(text, file.name.replace(/\.pdf$/i, ''), truncated)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Erreur lors de la lecture du PDF.')
     } finally {
@@ -32,7 +32,7 @@ export default function TfeUploader({ onExtracted }: Props) {
       return
     }
     setError(null)
-    onExtracted(pastedText.trim(), 'TFE (texte collé)')
+    onExtracted(pastedText.trim(), 'TFE (texte collé)', false)
   }
 
   return (
@@ -83,7 +83,7 @@ export default function TfeUploader({ onExtracted }: Props) {
               : (
                 <p className="text-jfb-gris text-sm">
                   Cliquez ou déposez votre PDF ici<br />
-                  <span className="text-xs text-jfb-gris-cl">Max 50 pages</span>
+                  <span className="text-xs text-jfb-gris-cl">Max 80 pages · 40 000 caractères analysés</span>
                 </p>
               )
             }

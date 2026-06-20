@@ -20,9 +20,11 @@ function NewSessionInner() {
   const [tfeResume, setTfeResume] = useState<TfeResume | null>(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [truncated, setTruncated] = useState(false)
 
-  const handleExtracted = (text: string, filename: string) => {
+  const handleExtracted = (text: string, filename: string, isTruncated: boolean) => {
     setTfeTexte(text)
+    setTruncated(isTruncated)
     if (!titre) setTitre(filename)
   }
 
@@ -133,6 +135,12 @@ function NewSessionInner() {
           {tfeTexte && (
             <p className="text-xs text-plai-teal font-semibold">
               ✓ Texte extrait — {tfeTexte.length.toLocaleString()} caractères
+            </p>
+          )}
+          {truncated && (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+              Le TFE dépasse 40 000 caractères — seules les premières parties ont été transmises au jury.
+              Les questions porteront sur ce qui a été lu, pas nécessairement sur la conclusion ou les annexes.
             </p>
           )}
           {error && <p className="text-red-600 text-sm">{error}</p>}
