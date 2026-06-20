@@ -1,6 +1,7 @@
 import type { TextItem } from 'pdfjs-dist/types/src/display/api'
 
 const MAX_CHARS = 40000
+let workerConfigured = false
 
 export function truncateToLimit(text: string, limit = MAX_CHARS): string {
   if (text.length <= limit) return text
@@ -9,8 +10,16 @@ export function truncateToLimit(text: string, limit = MAX_CHARS): string {
 }
 
 export async function extractTextFromPdf(file: File): Promise<string> {
+  if (file.type !== 'application/pdf') {
+    throw new Error('Le fichier sélectionné n\'est pas un PDF.')
+  }
+
   const pdfjsLib = await import('pdfjs-dist')
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+  if (!workerConfigured) {
+    // HTTPS explicit — pas de protocol-relative pour éviter les proxies d'entreprise
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+    workerConfigured = true
+  }
 
   const arrayBuffer = await file.arrayBuffer()
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
@@ -30,5 +39,10 @@ export async function extractTextFromPdf(file: File): Promise<string> {
         .join(' ')
     )
   }
-  return truncateToLimit(pages.join('\n'))
+
+  const result = truncateToLimit(pages.join('\n'))
+  if (result.trim().length < 50) {
+    throw new Error('Aucun texte extractible. Le PDF est peut-être scanné sans OCR — collez le texte manuellement.')
+  }
+  return result
 }

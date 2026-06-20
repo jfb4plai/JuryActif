@@ -57,11 +57,26 @@ export default function TfeUploader({ onExtracted }: Props) {
       {mode === 'upload' && (
         <div>
           <div
-            onClick={() => fileRef.current?.click()}
-            onKeyDown={e => e.key === 'Enter' && fileRef.current?.click()}
+            onClick={() => !loading && fileRef.current?.click()}
+            onKeyDown={e => {
+              if ((e.key === 'Enter' || e.key === ' ') && !loading) {
+                e.preventDefault()
+                fileRef.current?.click()
+              }
+            }}
+            onDragOver={e => { e.preventDefault(); e.stopPropagation() }}
+            onDrop={e => {
+              e.preventDefault()
+              e.stopPropagation()
+              if (loading) return
+              const file = e.dataTransfer.files?.[0]
+              if (file) handleFile(file)
+            }}
             role="button"
             tabIndex={0}
-            className="border-2 border-dashed border-jfb-bordure rounded-lg p-8 text-center cursor-pointer hover:border-jfb-gris transition-colors focus:outline-none focus:border-jfb-noir"
+            aria-label="Zone de dépôt PDF — cliquez ou déposez un fichier"
+            aria-disabled={loading}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors focus:outline-none focus:border-jfb-noir ${loading ? 'border-jfb-bordure cursor-not-allowed' : 'border-jfb-bordure cursor-pointer hover:border-jfb-gris'}`}
           >
             {loading
               ? <p className="text-jfb-gris text-sm">Extraction en cours…</p>
