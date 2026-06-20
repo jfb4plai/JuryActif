@@ -13,8 +13,8 @@ ${texte}
 
 Retourne un JSON strict avec cette structure :
 {
-  "titre": "${titre}",
-  "filiere": "${filiere}",
+  "titre": ${JSON.stringify(titre)},
+  "filiere": ${JSON.stringify(filiere)},
   "resume": "résumé factuel du TFE en 3-4 phrases",
   "points_cles": ["point 1", "point 2", "point 3", "point 4", "point 5"],
   "citations_notables": ["citation exacte du texte 1", "citation exacte du texte 2", "citation exacte du texte 3"]

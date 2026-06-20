@@ -32,16 +32,23 @@ export async function POST(request: NextRequest) {
   try {
     const message = await getClient().messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
+      max_tokens: 2048,
       messages: [{ role: 'user', content: buildAnalyzePrompt(titre, filiere, texte) }],
     })
 
     const rawText = message.content[0].type === 'text' ? message.content[0].text : ''
 
-    // Strip markdown code fences if Haiku wraps JSON in ```json ... ```
-    const jsonText = rawText.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim()
+    // Extract JSON from possible markdown fences (capture group handles preamble text)
+    const fenceMatch = rawText.match(/```(?:json)?\n?([\s\S]*?)\n?```/)
+    const jsonText = (fenceMatch ? fenceMatch[1] : rawText).trim()
 
     const resume = JSON.parse(jsonText) as TfeResume
+
+    // Minimal type guard — catch malformed IA responses before they reach the client
+    if (!resume.resume || !Array.isArray(resume.points_cles) || !Array.isArray(resume.citations_notables)) {
+      return NextResponse.json({ error: 'Réponse IA incomplète — réessayez' }, { status: 500 })
+    }
+
     return NextResponse.json(resume)
   } catch (e) {
     const msg = e instanceof SyntaxError
