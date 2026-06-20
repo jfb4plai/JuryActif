@@ -60,8 +60,8 @@ function NewSessionInner() {
     selected_question_ids: string[]
   }) => {
     setError(null)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/auth/login'); return }
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) { router.push('/auth/login'); return }
 
     const { data, error: dbError } = await supabase.from('jury_sessions').insert({
       user_id: user.id,
@@ -74,10 +74,12 @@ function NewSessionInner() {
       duree_cible_min: config.duree_cible_min,
       intensite: config.intensite,
       label_eleve: config.label_eleve || null,
+      selected_question_ids: config.selected_question_ids,
       started_at: new Date().toISOString(),
     }).select().single()
 
     if (dbError || !data) {
+      if (dbError) console.error('[jury_sessions insert]', dbError.code, dbError.message)
       setError('Erreur lors de la création de la session.')
       return
     }

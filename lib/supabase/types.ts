@@ -17,6 +17,7 @@ export interface JurySession {
   duree_cible_min: number
   intensite: Intensite
   label_eleve: string | null
+  selected_question_ids: string[]
   started_at: string | null
   ended_at: string | null
   created_at: string
