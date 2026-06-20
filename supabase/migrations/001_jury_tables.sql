@@ -35,7 +35,7 @@ create table jury_reports (
   user_id uuid references auth.users(id) on delete cascade not null,
   rapport_json jsonb not null,
   label_eleve text,
-  share_token text unique default encode(gen_random_bytes(16), 'hex'),
+  share_token text unique not null default encode(gen_random_bytes(16), 'hex'),
   created_at timestamptz default now() not null
 );
 
