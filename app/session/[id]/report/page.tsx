@@ -20,6 +20,7 @@ export default function ReportPage() {
 
   useEffect(() => {
     async function generate() {
+      if (!id) return
       // Check if report already exists (idempotency)
       const { data: existing } = await supabase
         .from('jury_reports')
@@ -103,8 +104,9 @@ export default function ReportPage() {
       .single()
 
     if (dbError || !saved) {
-      setState('error')
-      setError("Erreur lors de l'enregistrement du rapport.")
+      // Keep 'editing' state so teacher can retry — don't lose their edits
+      setState('editing')
+      setError("Erreur lors de l'enregistrement — réessayez.")
       return
     }
 
@@ -165,6 +167,11 @@ export default function ReportPage() {
         </div>
       </div>
 
+      {state === 'editing' && error && (
+        <div className="mb-4 bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       {state === 'saved' && shareUrl && (
         <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded p-3 text-sm text-emerald-800">
           Rapport enregistré. Lien accompagnant : <span className="font-mono text-xs">{shareUrl}</span>
