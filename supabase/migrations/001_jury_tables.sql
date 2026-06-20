@@ -53,5 +53,13 @@ create policy "users own questions"
 create policy "users own reports"
   on jury_reports for all using (auth.uid() = user_id);
 
-create policy "public read report by share_token"
-  on jury_reports for select using (share_token is not null);
+-- Fonction sécurisée pour l'accès public par token (bypasse RLS via security definer)
+-- Utilisée par la page /r/[token] sans authentification
+create or replace function jury_get_report_by_token(p_token text)
+returns jury_reports
+language sql
+security definer
+stable
+as $$
+  select * from jury_reports where share_token = p_token limit 1;
+$$;
