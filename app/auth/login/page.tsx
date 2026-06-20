@@ -17,7 +17,16 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) { setError(error.message); setLoading(false); return }
+    if (error) {
+      const msg = error.message.toLowerCase().includes('invalid')
+        ? 'Email ou mot de passe incorrect.'
+        : 'Erreur de connexion. Réessayez dans quelques instants.'
+      setError(msg)
+      setLoading(false)
+      return
+    }
+    setLoading(false)
+    router.refresh()
     router.push('/')
   }
 
