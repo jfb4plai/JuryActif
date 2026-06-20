@@ -24,8 +24,8 @@ export async function extractTextFromPdf(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer()
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
 
-  if (pdf.numPages > 50) {
-    throw new Error(`Le PDF contient ${pdf.numPages} pages. Limite : 50 pages.`)
+  if (pdf.numPages > 80) {
+    throw new Error(`Le PDF contient ${pdf.numPages} pages. Limite : 80 pages.`)
   }
 
   const pages: string[] = []
