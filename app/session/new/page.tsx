@@ -139,8 +139,7 @@ function NewSessionInner() {
           )}
           {truncated && (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
-              Le TFE dépasse 40 000 caractères — seules les premières parties ont été transmises au jury.
-              Les questions porteront sur ce qui a été lu, pas nécessairement sur la conclusion ou les annexes.
+              Le TFE est très volumineux — seule une partie a été transmise au jury. Les questions porteront sur ce qui a été lu.
             </p>
           )}
           {error && <p className="text-red-600 text-sm">{error}</p>}

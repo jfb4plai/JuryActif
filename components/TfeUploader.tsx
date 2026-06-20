@@ -83,7 +83,7 @@ export default function TfeUploader({ onExtracted }: Props) {
               : (
                 <p className="text-jfb-gris text-sm">
                   Cliquez ou déposez votre PDF ici<br />
-                  <span className="text-xs text-jfb-gris-cl">Max 80 pages · 40 000 caractères analysés</span>
+                  <span className="text-xs text-jfb-gris-cl">Max 80 pages</span>
                 </p>
               )
             }

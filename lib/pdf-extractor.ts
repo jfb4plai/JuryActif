@@ -1,6 +1,6 @@
 import type { TextItem } from 'pdfjs-dist/types/src/display/api'
 
-const MAX_CHARS = 40000
+const MAX_CHARS = 150000
 let workerConfigured = false
 
 export function truncateToLimit(text: string, limit = MAX_CHARS): { text: string; truncated: boolean } {
