@@ -45,13 +45,25 @@ alter table jury_questions enable row level security;
 alter table jury_reports enable row level security;
 
 create policy "users own sessions"
-  on jury_sessions for all using (auth.uid() = user_id);
+  on jury_sessions for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 
 create policy "users own questions"
-  on jury_questions for all using (auth.uid() = user_id);
+  on jury_questions for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 
 create policy "users own reports"
-  on jury_reports for all using (auth.uid() = user_id);
+  on jury_reports for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- Index sur user_id pour les requêtes courantes
+create index on jury_sessions(user_id);
+create index on jury_questions(user_id);
+create index on jury_reports(user_id);
+create index on jury_reports(session_id);
 
 -- Fonction sécurisée pour l'accès public par token (bypasse RLS via security definer)
 -- Utilisée par la page /r/[token] sans authentification
@@ -60,6 +72,7 @@ returns jury_reports
 language sql
 security definer
 stable
+set search_path = public
 as $$
   select * from jury_reports where share_token = p_token limit 1;
 $$;
