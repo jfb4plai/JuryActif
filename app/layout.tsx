@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { HeaderAuthAction } from '@/components/HeaderAuthAction'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -21,15 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Image src="/plai-logo.jpg" alt="PLAI" width={160} height={64} className="object-contain" priority />
           </Link>
           <div className="flex items-center gap-4">
-            {user ? (
-              <form action="/auth/signout" method="post">
-                <button type="submit" className="text-xs text-jfb-gris hover:text-jfb-noir">Déconnexion</button>
-              </form>
-            ) : (
-              <Link href="/auth/login" className="text-xs font-semibold text-white px-3 py-1.5 bg-jfb-noir rounded">
-                Connexion
-              </Link>
-            )}
+            <HeaderAuthAction signedIn={!!user} />
           </div>
         </header>
         {children}
